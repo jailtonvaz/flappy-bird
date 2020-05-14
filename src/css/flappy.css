@@ -50,8 +50,7 @@
     height: 150px;
     width: 110px;
     background: linear-gradient(90deg, #639301, #A5E82E);
-    border: 2px solid #000;    
-    border: 2px solid #000;    
+    border: 2px solid #000;  
 }
 
 .progress {
@@ -60,4 +59,5 @@
     right: 10px;
     font-family: Pixel;
     font-size: 70px;
+    z-index: 100;
 }

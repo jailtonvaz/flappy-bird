@@ -39,6 +39,7 @@ function PairOfObstacle(height, opening, x) {
 
     this.getX = () => parseInt(this.element.style.left.split('px')[0])
     this.setX = x => this.element.style.left = `${x}px`
+    
     this.getWidth = () => this.element.clientWidth
 
     this.giveOpening()
@@ -67,13 +68,14 @@ function Obstacles(heigth, width, opening, distance, addScore) {
             if (pair.getX() < -pair.getWidth()) {
                 pair.setX(pair.getX() + distance * this.pairs.length)
                 pair.giveOpening()
-
-                const half = width / 2
-                const halved = pair.getX() + movement >= half && pair.getX() < half
-                if (halved)
-                    addScore()
             }
-        });
+            
+            const half = width / 2
+            const halved = pair.getX() + movement >= half && pair.getX() < half
+            console.log(`half=${half} | halved=${halved}`)
+            if (halved) 
+                addScore()
+        })
     }
 }
 
@@ -92,12 +94,12 @@ function Bird(heightGame) {
 
     this.animate = () => {
         const newY = this.getY() + (flying ? 8 : -5)
-        const maxHeight = heightGame - this.element.clientWidth
+        const maxHeight = heightGame - this.element.clientHeight
 
         if (newY <= 0) {
             this.setY(0)
-        } else if (newY >= heightGame) {
-            this.setY(heightGame)
+        } else if (newY >= maxHeight) {
+            this.setY(maxHeight)
         } else {
             this.setY(newY)
         } 
@@ -106,12 +108,81 @@ function Bird(heightGame) {
     this.setY(heightGame / 2)
 }
 
-const barreiras = new Obstacles(700, 1200, 200, 400)
-const passaro = new Bird(700)
-const areaDoJogo = document.querySelector('[wm-flappy]')
-areaDoJogo.appendChild(passaro.element)
-barreiras.pairs.forEach(pair => areaDoJogo.appendChild(pair.element))
-setInterval(() => {
-    barreiras.animate()
-    passaro.animate()
-}, 20);
+
+function Progress() {
+    this.element = createElementWithClass('span', 'progress')
+    this.updateScore = score => {
+        this.element.innerHTML = score
+    }
+
+    this.updateScore(0)
+}
+
+
+function isSuperposed(elementA, elementB) {
+    const a = elementA.getBoundingClientRect()
+    const b = elementB.getBoundingClientRect()
+
+    const horizontal = (a.left + a.width >= b.left) && (b.left + b.width >= a.left)
+    const vertical = (a.top + a.height >= b.top) && (b.top + b.height >= a.top)
+
+    return horizontal && vertical
+}
+
+
+function crashed(bird, obstacles) {
+    let crashed = false
+
+    obstacles.pairs.forEach(pairOfObstacle => {
+        if(!crashed) {
+            const top = pairOfObstacle.top.element
+            const bottom = pairOfObstacle.bottom.element
+
+            crashed = isSuperposed(bird.element, top) || isSuperposed(bird.element, bottom)
+        }
+    })
+
+    return crashed
+}
+
+function FlappyBird() {
+    let score = 0
+
+    const gameArea = document.querySelector('[wm-flappy]')
+    const height = gameArea.clientHeight
+    const width = gameArea.clientWidth
+
+    const progress = new Progress()
+    const obstacles = new Obstacles(height, width, 200, 400, 
+        () => progress.updateScore(++score))
+    const bird = new Bird(height)
+
+    gameArea.appendChild(progress.element)
+    gameArea.appendChild(bird.element)
+    obstacles.pairs.forEach(pair => gameArea.appendChild(pair.element))
+
+    this.start = () => {
+        const timer = setInterval(() => {
+            obstacles.animate()
+            bird.animate()
+            if (crashed(bird, obstacles)) {
+                clearInterval(timer)
+            }
+        }, 20);
+    }
+}
+
+
+new FlappyBird().start()
+// const barreiras = new Obstacles(700, 1200, 200, 400)
+// const passaro = new Bird(700)
+
+// const areaDoJogo = document.querySelector('[wm-flappy]')
+// areaDoJogo.appendChild(passaro.element)
+// areaDoJogo.appendChild(new Progress().element)
+// barreiras.pairs.forEach(pair => areaDoJogo.appendChild(pair.element))
+
+// setInterval(() => {
+//     barreiras.animate()
+//     passaro.animate()
+// }, 20);
