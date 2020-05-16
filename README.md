@@ -21,7 +21,7 @@
     <img alt="Repository issues" src="https://img.shields.io/github/issues/jailtonvaz/flappy-bird">
   </a>
 
-  <img alt="GitHub" src="https://img.shields.io/github/license/jailtonvaz/flappy-bird">   
+  <img alt="GitHub license" src="https://img.shields.io/github/license/jailtonvaz/flappy-bird">   
 </p>
 
 <p align="center">
@@ -50,6 +50,7 @@ To clone and run this application, you'll need [Git](https://git-scm.com). From 
 $ git clone https://github.com/jailtonvaz/flappy-bird
 ```
 Then open the *index.html* file in the browser of your choice.
+
 For the bird to fly, press any key repeatedly. I recommend using the space key.
 
 ## :memo: License
